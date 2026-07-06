@@ -1,5 +1,5 @@
 import express from "express";
-import { getDiscordToken } from "../controllers/discordController.js";
+import { getDiscordToken } from "../controllers/discordControllers.js";
 
 const router = express.Router();
 

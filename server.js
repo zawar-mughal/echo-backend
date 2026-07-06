@@ -11,6 +11,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+    res.status(200).json({ message: "Echo backend is running" });
+});
+
 app.use("/api/discord", discordRoutes);
 
 const PORT = process.env.PORT || 5000;
