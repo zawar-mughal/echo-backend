@@ -1,11 +1,24 @@
+import dotenv from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY // service role key — server only, never expose
-);
+dotenv.config();
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabaseAdmin = supabaseUrl && supabaseServiceRoleKey
+  ? createClient(supabaseUrl, supabaseServiceRoleKey)
+  : null;
+
+const ensureSupabaseConfigured = () => {
+  if (!supabaseAdmin) {
+    throw new Error("Supabase environment variables are not configured.");
+  }
+};
 
 export const upsertDiscordProfile = async (discordUser) => {
+  ensureSupabaseConfigured();
+
   const placeholderEmail = `discord-${discordUser.id}@users.echo.app`;
 
   const { data: existingProfile } = await supabaseAdmin
@@ -46,6 +59,8 @@ export const upsertDiscordProfile = async (discordUser) => {
 };
 
 export const generateSupabaseLoginToken = async (email) => {
+  ensureSupabaseConfigured();
+
   const { data, error } = await supabaseAdmin.auth.admin.generateLink({
     type: "magiclink",
     email,
